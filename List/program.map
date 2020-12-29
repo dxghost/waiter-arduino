@@ -1,0 +1,19 @@
+RAM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+_base_y                                                           0x0160       4
+
+EEPROM Allocation
+Variable                                                          Address   Size
+--------------------------------------------------------------------------------
+
+Register Allocation
+Variable                                                          Register  Size
+--------------------------------------------------------------------------------
+upperNibble                                                       R5           1
+keyCode                                                           R4           1
+keyPressed                                                        R7           1
+k                                                                 R6           1
+_lcd_x                                                            R9           1
+_lcd_y                                                            R8           1
+_lcd_maxx                                                         R11          1
