@@ -4,7 +4,7 @@ Resturant ordering system simulation using AVR ATMEGA8
 ![logo](Assets/waiter.jpg)
 
 ## Schematics:
-![schematics](Assets/Schematics.bmp)
+![schematics](Assets/Schematics.jpg)
 
 ## Simulation Preview:
 ![Simulation](Assets/Simulation.jpg)
