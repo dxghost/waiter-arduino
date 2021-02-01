@@ -2,6 +2,7 @@
 #include<avr/io.h>
 #include<util/delay.h>
 #include<stdio.h>
+#include<stdbool.h>
 
 #define rs PB2
 #define en PB3
@@ -58,33 +59,44 @@ int main(void)
 	second_line();
 	dis_print("to our resturant");
 	_delay_ms(50);
-	
+	lcd_clear();
 	show_menu();	
 	
-
+	_delay_ms(50);
+	lcd_clear();
+	
+	bool pause = false;
 	while(1)
 	{	
 		int k = press_key();
+		
 		if(k){
 			if (k==9){
 				lcd_clear();
 				dis_print("press a key");
+				pause = false;
 				continue;
 			}else if(k==11){
 				lcd_clear();
 				dis_print("Finished");
 				break;
 			}
-			lcd_clear();
-			char str[16];
-			first_line();
-			sprintf(str,"%c: %s",KEYS[k],ITEMS[k]);
-			dis_print(str);
-			second_line();
-			dis_print("*:add, #:finish");
-			_delay_ms(10);
+			if(!pause){
+				lcd_clear();
+				char str[16];
+				first_line();
+				sprintf(str,"%c: %s",KEYS[k],ITEMS[k]);
+				dis_print(str);
+				second_line();
+				dis_print("*:add, #:finish");
+				_delay_ms(10);
+				first_line();
+				pause = true;
+			}
+
 
 		}
+		_delay_ms(20);
 		
 	}
 	
@@ -135,7 +147,6 @@ int press_key()
 }
 
 void show_menu(){
-	lcd_clear();
 	dis_print("***** MENU *****");
 	_delay_ms(30);
 	for(int i =0; i<9; i+=2){
