@@ -17,7 +17,37 @@ void lcd_clear();
 void lcd_clear_animation();
 void second_line();
 void first_line();
-char press_key();
+int press_key();
+void show_menu();
+
+const char ITEMS[12][10] = {
+	"Beef",
+	"Pizza",
+	"Kabab",
+	"Chicken",
+	"Soup",
+	"Tofu",
+	"Sushi",
+	"Steak",
+	"Soda",
+	"*",
+	"Salad",
+	"#"
+};
+const char KEYS[12] = {
+	'1',
+	'2',
+	'3',
+	'4',
+	'5',
+	'6',
+	'7',
+	'8',
+	'9',
+	'*',
+	'0',
+	'#'
+};
 
 int main(void)
 {
@@ -28,34 +58,45 @@ int main(void)
 	second_line();
 	dis_print("to our resturant");
 	_delay_ms(50);
-	lcd_clear_animation();
 	
-	_delay_ms(50);
+	show_menu();	
 	
 
 	while(1)
 	{	
-		char k = press_key();
+		int k = press_key();
 		if(k){
+			if (k==9){
+				lcd_clear();
+				dis_print("press a key");
+				continue;
+			}else if(k==11){
+				lcd_clear();
+				dis_print("Finished");
+				break;
+			}
+			lcd_clear();
 			char str[16];
-			sprintf(str,"pressed: %c",k);
+			first_line();
+			sprintf(str,"%c: %s",KEYS[k],ITEMS[k]);
 			dis_print(str);
+			second_line();
+			dis_print("*:add, #:finish");
 			_delay_ms(10);
-			lcd_clear_animation();
+
 		}
 		
 	}
 	
 }
 
-
-char press_key()
+int press_key()
 {
 	unsigned char c,r;
 	
 	DDRA=0xf0;
 	PORTA=0xff;
-	unsigned char k[4][3]={{'1','2','3'},{'4','5','6'},{'7','8','9'},{'*','0','#'}};
+	int k[4][3]={{0,1,2},{3,4,5},{6,7,8},{9,10,11}};
 	
 	do{
 		PORTA &= 0x0f;
@@ -91,6 +132,24 @@ char press_key()
 	else if(r==0x0d) return k[1][c];
 	else if(r==0x0b) return k[2][c];
 	else return k[3][c];
+}
+
+void show_menu(){
+	lcd_clear();
+	dis_print("***** MENU *****");
+	_delay_ms(30);
+	for(int i =0; i<9; i+=2){
+		lcd_clear();
+		char str[16];
+		sprintf(str,"%s: press %c",ITEMS[i],KEYS[i]);
+		dis_print(str);
+		second_line();
+		if(i==8)i++;
+		sprintf(str,"%s: press %c",ITEMS[i+1],KEYS[i+1]);
+		 dis_print(str);
+		_delay_ms(40);
+		first_line();
+	}
 }
 
 void second_line(){
