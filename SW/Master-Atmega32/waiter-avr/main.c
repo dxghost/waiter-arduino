@@ -1,14 +1,15 @@
-#define F_CPU 16000000UL
+#define F_CPU	8000000UL	//--- CPU Clock Frequency
+
 #include<avr/io.h>
 #include<util/delay.h>
 #include<stdio.h>
 #include<stdbool.h>
 #include<avr/interrupt.h>
-#include<avr/pgmspace.h>
-#include "sin.h"
+#include "I2C_Master_C_file.c"	/* Include I2C header file */
 
+#define Slave_Write_Address		0x20
+#define Slave_Read_Address		0x21
 
-#define SAMPLE_RATE 8000;
 #define rs PB2
 #define en PB3
 #define pr PB0
@@ -29,10 +30,7 @@ void second_line();
 void first_line();
 int press_key();
 void show_menu();
-void i2c_start(void);
-void i2c_write(unsigned char data);
-void i2c_init(void);
-void i2c_stop();
+
 
 const char ITEMS[12][10] = {
 	"Beef",
@@ -63,13 +61,34 @@ const char KEYS[12] = {
 	'#'
 };
 
+bool ordered_items[12] = {
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false,
+	false
+};
 
 int main(void)
 {
 	DDRB=0xFF;
+	DDRC=0xFF;
+	PORTC=0xFF;
+
+	I2C_Init();
+
+	
 	lcd_init();
 	
-	
+
+
 	
 	dis_print("Welcome");
 	second_line();
@@ -78,11 +97,6 @@ int main(void)
 	lcd_clear();
 	//show_menu();	
 	sei();
-	i2c_init();
-	i2c_start();
-	i2c_write(0b11010000);
-	i2c_write(0b11110000);
-	i2c_stop();
 	
 	_delay_ms(50);
 	lcd_clear();
@@ -91,13 +105,17 @@ int main(void)
 	while(1)
 	{	
 		k = press_key();
+		
+
+		
 		if(k && isWriting == false){
 			GICR = (1<<INT0);
 			isWriting = true;
+			
 		}
+		
 		GICR = (0<<INT0);
 		isWriting = false;
-		_delay_ms(20);
 		
 	}
 	
@@ -105,16 +123,29 @@ int main(void)
 }
 
 ISR (INT0_vect){
+
 	if (k==9){
 		lcd_clear();
 		dis_print("press a key");
 		pause = false;
+		
 	}else if(k==11){
 		lcd_clear();
 		dis_print("Finished");
+		
+		I2C_Start_Wait(Slave_Write_Address);
+		for(int i = 0; i<12; i++){
+			if(ordered_items[i]==true){
+				I2C_Write(KEYS[i]);
+				_delay_ms(50);
+			}
+		}
+					
 		PORTB = (1<<pr);
 		_delay_ms(20);
 		PORTB = (0<<pr);
+
+		
 	}else{
 		if(!pause){
 			lcd_clear();
@@ -124,9 +155,12 @@ ISR (INT0_vect){
 			dis_print(str);
 			second_line();
 			dis_print("*:add, #:finish");
-			_delay_ms(10);
 			first_line();
+			
+			ordered_items[k]=true;
+			
 			pause = true;
+			
 		}
 	}
 }
@@ -266,29 +300,4 @@ void dis_print(char* p){
 	while(*p){
 		dis_data(*p++);
 	}
-}
-
-void i2c_start(void)
-{
-	TWCR = (1<<TWINT) | (1<<TWSTA) | (1<<TWEN);
-	while ((TWCR & (1<<TWINT)) == 0);
-}
-
-void i2c_write(unsigned char data)
-{
-	TWDR = data;
-	TWCR = (1<<TWINT) | (1<<TWEN);
-	while ((TWCR & (1<<TWINT)) == 0);
-}
-
-void i2c_init(void)
-{
-	TWSR=0x00;
-	TWBR=0x47;
-	TWCR=0x04;
-}
-
-void i2c_stop()
-{
-	TWCR = (1<<TWINT) | (1<<TWEN) | (1<<TWSTO);
 }
