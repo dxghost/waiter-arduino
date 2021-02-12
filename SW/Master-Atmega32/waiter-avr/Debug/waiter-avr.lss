@@ -179,7 +179,7 @@ Disassembly of section .text:
  118:	cd bf       	out	0x3d, r28	; 61
  11a:	80 ef       	ldi	r24, 0xF0	; 240
  11c:	8a bb       	out	0x1a, r24	; 26
- 11e:	8f ef       	ldi	r24, 0xFF	; 255
+ 11e:	8f ee       	ldi	r24, 0xEF	; 239
  120:	8b bb       	out	0x1b, r24	; 27
  122:	88 e1       	ldi	r24, 0x18	; 24
  124:	e0 e6       	ldi	r30, 0x60	; 96

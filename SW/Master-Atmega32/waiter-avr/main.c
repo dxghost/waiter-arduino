@@ -170,7 +170,7 @@ int press_key()
 	unsigned char c,r;
 	
 	DDRA=0xf0;
-	PORTA=0xff;
+	PORTA=0xef;
 	int k[4][3]={{0,1,2},{3,4,5},{6,7,8},{9,10,11}};
 	
 	do{
